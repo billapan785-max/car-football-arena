@@ -579,9 +579,9 @@ export function createGame(mount: HTMLElement, carOptions?: { color: number; acc
   const SKY_COLOR = isCyber ? 0x05040d : SKY;
 
   const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
-  const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: false, powerPreference: "high-performance" });
+  const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: false, powerPreference: "high-performance", precision: isMobile ? "mediump" : "highp" });
   renderer.setClearColor(SKY_COLOR, 1);
-  renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.25));
   renderer.shadowMap.enabled = !isMobile;
   if (!isMobile) {
     renderer.shadowMap.type = THREE.BasicShadowMap;
@@ -635,7 +635,7 @@ export function createGame(mount: HTMLElement, carOptions?: { color: number; acc
   scene.add(ambient);
 
   if (isCyber) {
-    const starCount = 1200;
+    const starCount = isMobile ? 400 : 1200;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount * 3; i += 3) {
@@ -1443,9 +1443,11 @@ export function createGame(mount: HTMLElement, carOptions?: { color: number; acc
         }
         
         // Add audience cubes on the stairs with staircase gaps (aisles)
-        const numPeople = isSide 
-          ? (isCyber ? 140 : 40 + Math.random() * 30) * 3
-          : (isCyber ? 90 : 25 + Math.random() * 20) * 3;
+        const numPeopleBase = isSide 
+          ? (isCyber ? 140 : 40 + Math.random() * 30)
+          : (isCyber ? 90 : 25 + Math.random() * 20);
+        
+        const numPeople = Math.floor(numPeopleBase * (isMobile ? 1.0 : 3.0));
 
         for (let p = 0; p < numPeople; p++) {
           const px = (Math.random() - 0.5) * (width - 1.5);
