@@ -450,8 +450,15 @@ export default function App() {
   const [showMoreLoginOptions, setShowMoreLoginOptions] = useState(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
 
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
+
   // Fullscreen and Orientation Lock + Back Button Interception
   useEffect(() => {
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+
     window.history.pushState({ noBackExitsApp: true }, '');
 
     const handlePopState = (e: PopStateEvent) => {
@@ -487,6 +494,7 @@ export default function App() {
     document.addEventListener('click', handleUserInteraction, { once: true });
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
@@ -1835,14 +1843,13 @@ export default function App() {
     return (
       <div 
         style={{ 
-          width: '100vw', 
-          height: '100vh', 
+          position: 'fixed',
+          inset: 0,
           backgroundImage: hasBgError ? 'radial-gradient(circle at 50% 30%, #111a2e 0%, #060c18 60%, #02050b 100%)' : `url(${bgImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#ffffff', 
           fontFamily: 'Inter, system-ui, sans-serif',
-          position: 'relative',
           overflow: 'hidden'
         }}
       >
@@ -1933,12 +1940,11 @@ export default function App() {
     return (
       <div 
         style={{ 
-          width: '100vw', 
-          height: '100vh', 
+          position: 'fixed',
+          inset: 0,
           backgroundImage: `url(/loginpage.png)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          position: 'relative',
           overflow: 'hidden',
           fontFamily: 'Inter, system-ui, sans-serif'
         }}
@@ -2335,15 +2341,12 @@ export default function App() {
       <div 
         id="match-loading-container"
         style={{ 
-          width: '100vw', 
-          height: '100dvh', 
+          position: 'fixed',
+          inset: 0,
           backgroundImage: 'url(/mainmenubg.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundColor: '#000000',
-          position: 'absolute',
-          top: '0',
-          left: '0',
           overflow: 'hidden',
           userSelect: 'none',
           display: 'flex',
@@ -2354,7 +2357,7 @@ export default function App() {
         }}
       >
         {/* Empty layout, only bottom loading HUD is visible */}
-        <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ width: '100%', maxWidth: 'min(90vw, 800px)', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           
           {/* Active Mode Name above the loading bar */}
           <div style={{ 
@@ -2423,14 +2426,11 @@ export default function App() {
       <div 
         id="lobby-container"
         style={{ 
-          width: '100vw', 
-          height: '100dvh', 
+          position: 'fixed',
+          inset: 0,
           backgroundColor: '#000000',
           fontFamily: 'Inter, system-ui, sans-serif',
           color: '#ffffff',
-          position: 'absolute',
-          top: '0',
-          left: '0',
           overflow: 'hidden',
           userSelect: 'none'
         }}
@@ -2630,7 +2630,7 @@ export default function App() {
           </div>
           
           {/* TOP BAR */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '14px 20px', background: 'linear-gradient(to bottom, rgba(3,8,20,0.8) 0%, rgba(3,8,20,0) 100%)', zIndex: 40 }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: 'env(safe-area-inset-top, 14px) env(safe-area-inset-right, 20px) 14px env(safe-area-inset-left, 20px)', background: 'linear-gradient(to bottom, rgba(3,8,20,0.8) 0%, rgba(3,8,20,0) 100%)', zIndex: 40 }}>
             
             {/* CYBERPUNK USER PROFILE BOX (Placed on Left) */}
             <div style={{ position: 'relative', pointerEvents: 'auto', marginLeft: '-11px', marginTop: '-11px' }}>
@@ -6332,7 +6332,7 @@ export default function App() {
 
   // Active Gameplay rendering screen
   return (
-    <div ref={mountRef} className="boostball-root">
+    <div ref={mountRef} className="boostball-root" style={{ position: 'fixed', inset: 0 }}>
       {/* 3D WebGL Canvas is appended into mountRef container dynamically */}
 
       {/* Floating HUD controls on top of standard gameplay canvas */}
@@ -6541,6 +6541,48 @@ export default function App() {
       )}
 
       <ScreenGate gateState={gateState} />
+
+      {/* PORTRAIT OVERLAY - Force Landscape Experience */}
+      {isPortrait && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: '#030814',
+          zIndex: 2000000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px',
+          textAlign: 'center',
+          color: '#fff'
+        }}>
+          <div style={{ 
+            width: '80px', 
+            height: '80px', 
+            borderRadius: '50%', 
+            background: 'rgba(67, 245, 255, 0.1)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginBottom: '24px',
+            border: '2px solid #43f5ff'
+          }}>
+            <Monitor size={40} color="#43f5ff" style={{ transform: 'rotate(90deg)', animation: 'wiggle 2s ease-in-out infinite' }} />
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Rotate Your Device</h2>
+          <p style={{ color: '#8fa2c4', fontSize: '1rem', lineHeight: '1.5', maxWidth: '300px' }}>
+            Please rotate your phone to <b>Landscape Mode</b> to play Car Football Arena.
+          </p>
+          <style>{`
+            @keyframes wiggle {
+              0%, 100% { transform: rotate(90deg); }
+              25% { transform: rotate(110deg); }
+              75% { transform: rotate(70deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }
