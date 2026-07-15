@@ -3078,6 +3078,9 @@ export function createGame(mount: HTMLElement, carOptions?: { color: number; acc
     if (boostBarEl) boostBarEl.style.transform = `scaleX(${clamp(player.boost / 100, 0, 1)})`;
   }
 
+  let lastLcdUpdateMs = 0;
+  const LCD_UPDATE_INTERVAL = 1000 / 30; // 30 FPS update for stadium screens (smoother)
+
   function render(ms: number, dt: number) {
     // Dynamically update the side screens (white background, animated/scrolling texts, goal overlays)
     const timeS = ms / 1000;
@@ -3141,104 +3144,113 @@ export function createGame(mount: HTMLElement, carOptions?: { color: number; acc
     
     const showGoal = goalBannerTimer > 0 && goalBannerScorer;
 
+    // Optimization: Only update LCD textures at 15 FPS and only when needed
+    const canUpdateLcd = (ms - lastLcdUpdateMs) > LCD_UPDATE_INTERVAL;
+    
     for (let i = 0; i < 4; i++) {
       const canvas = screenCanvases[i];
       const ctx = screenCtxs[i];
       const texture = techTextures[i];
       if (!canvas || !ctx || !texture) continue;
 
-      if (showGoal) {
-        // --- GOAL BANNER ANIMATION ---
-        const scorer = goalBannerScorer;
-        const flashRate = 12; // flashes per second
-        const isFlashOn = Math.floor(timeS * flashRate) % 2 === 0;
+      if (canUpdateLcd) {
+        if (showGoal) {
+          // --- GOAL BANNER ANIMATION ---
+          const scorer = goalBannerScorer;
+          const flashRate = 12; // flashes per second
+          const isFlashOn = Math.floor(timeS * flashRate) % 2 === 0;
 
-        if (scorer === "player") {
-          ctx.fillStyle = isFlashOn ? "#ffffff" : "#1f86ff";
+          if (scorer === "player") {
+            ctx.fillStyle = isFlashOn ? "#ffffff" : "#1f86ff";
+          } else {
+            ctx.fillStyle = isFlashOn ? "#ffffff" : "#ff3d3d";
+          }
+          ctx.fillRect(0, 0, 512, 128);
+
+          // Bold neon accents
+          ctx.strokeStyle = scorer === "player" ? "#0066cc" : "#cc0000";
+          ctx.lineWidth = 10;
+          ctx.strokeRect(5, 5, 502, 118);
+
+          ctx.strokeStyle = "#111111";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(15, 15, 482, 98);
+
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+
+          const pulse = 1.0 + Math.sin(timeS * 16) * 0.08;
+          ctx.save();
+          ctx.translate(256, 64);
+          ctx.scale(pulse, pulse);
+
+          ctx.font = "italic bold 44px 'Inter', sans-serif";
+          ctx.fillStyle = isFlashOn ? "#111111" : "#ffffff";
+          
+          const scorerText = scorer === "player" ? "GOAL BY PLAYER!" : "GOAL BY AI BOT!";
+          ctx.fillText(`⚽ ${scorerText} ⚽`, 0, 0);
+          ctx.restore();
         } else {
-          ctx.fillStyle = isFlashOn ? "#ffffff" : "#ff3d3d";
+          // --- STANDARD DYNAMIC STATE ---
+          // Clean white background as requested: "side per majood sabhi screen ka color white ker do"
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, 512, 128);
+
+          // Soft tech grid pattern to keep the stadium look premium
+          ctx.strokeStyle = "rgba(15, 23, 42, 0.08)";
+          ctx.lineWidth = 1;
+          for (let x = 0; x <= 512; x += 32) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 128); ctx.stroke();
+          }
+          for (let y = 0; y <= 128; y += 32) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+          }
+
+          // Carbon side plates
+          ctx.fillStyle = "#1e293b";
+          ctx.fillRect(0, 0, 16, 128);
+          ctx.fillRect(512 - 16, 0, 16, 128);
+
+          // Tech white status indicators on margins
+          ctx.fillStyle = "#ffffff";
+          for (let dotY = 16; dotY < 128; dotY += 32) {
+            ctx.beginPath(); ctx.arc(8, dotY, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(512 - 8, dotY, 3, 0, Math.PI * 2); ctx.fill();
+          }
+
+          // Horizontal warning-stripes styled borders at top and bottom
+          ctx.fillStyle = "rgba(30, 41, 59, 0.15)";
+          ctx.fillRect(16, 0, 480, 8);
+          ctx.fillRect(16, 120, 480, 8);
+
+          // Dynamic cycling messages
+          const msgIndex = Math.floor(timeS / 4) % cycleMessages.length;
+          const screenText = cycleMessages[(msgIndex + i) % cycleMessages.length];
+
+          // Manual text scroll logic
+          const textWidth = 360;
+          const scrollSpeed = 120; // pixels per second
+          const scrollRange = 512 + textWidth;
+          const rawScroll = (timeS * scrollSpeed) + (i * 180);
+          const textX = 512 - (rawScroll % scrollRange);
+
+          ctx.font = "bold 34px 'Inter', sans-serif";
+          ctx.fillStyle = "#0f172a"; // Deep charcoal color text for crisp legibility
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+
+          // Draw scrolling text
+          ctx.fillText(screenText, textX, 64);
+          // Draw wrapped instance for seamless scrolling
+          ctx.fillText(screenText, textX + scrollRange, 64);
         }
-        ctx.fillRect(0, 0, 512, 128);
 
-        // Bold neon accents
-        ctx.strokeStyle = scorer === "player" ? "#0066cc" : "#cc0000";
-        ctx.lineWidth = 10;
-        ctx.strokeRect(5, 5, 502, 118);
-
-        ctx.strokeStyle = "#111111";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(15, 15, 482, 98);
-
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        const pulse = 1.0 + Math.sin(timeS * 16) * 0.08;
-        ctx.save();
-        ctx.translate(256, 64);
-        ctx.scale(pulse, pulse);
-
-        ctx.font = "italic bold 44px 'Inter', sans-serif";
-        ctx.fillStyle = isFlashOn ? "#111111" : "#ffffff";
-        
-        const scorerText = scorer === "player" ? "GOAL BY PLAYER!" : "GOAL BY AI BOT!";
-        ctx.fillText(`⚽ ${scorerText} ⚽`, 0, 0);
-        ctx.restore();
-      } else {
-        // --- STANDARD DYNAMIC STATE ---
-        // Clean white background as requested: "side per majood sabhi screen ka color white ker do"
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, 512, 128);
-
-        // Soft tech grid pattern to keep the stadium look premium
-        ctx.strokeStyle = "rgba(15, 23, 42, 0.08)";
-        ctx.lineWidth = 1;
-        for (let x = 0; x <= 512; x += 32) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 128); ctx.stroke();
-        }
-        for (let y = 0; y <= 128; y += 32) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
-        }
-
-        // Carbon side plates
-        ctx.fillStyle = "#1e293b";
-        ctx.fillRect(0, 0, 16, 128);
-        ctx.fillRect(512 - 16, 0, 16, 128);
-
-        // Tech white status indicators on margins
-        ctx.fillStyle = "#ffffff";
-        for (let dotY = 16; dotY < 128; dotY += 32) {
-          ctx.beginPath(); ctx.arc(8, dotY, 3, 0, Math.PI * 2); ctx.fill();
-          ctx.beginPath(); ctx.arc(512 - 8, dotY, 3, 0, Math.PI * 2); ctx.fill();
-        }
-
-        // Horizontal warning-stripes styled borders at top and bottom
-        ctx.fillStyle = "rgba(30, 41, 59, 0.15)";
-        ctx.fillRect(16, 0, 480, 8);
-        ctx.fillRect(16, 120, 480, 8);
-
-        // Dynamic cycling messages
-        const msgIndex = Math.floor(timeS / 4) % cycleMessages.length;
-        const screenText = cycleMessages[(msgIndex + i) % cycleMessages.length];
-
-        // Manual text scroll logic
-        const textWidth = 360;
-        const scrollSpeed = 120; // pixels per second
-        const scrollRange = 512 + textWidth;
-        const rawScroll = (timeS * scrollSpeed) + (i * 180);
-        const textX = 512 - (rawScroll % scrollRange);
-
-        ctx.font = "bold 34px 'Inter', sans-serif";
-        ctx.fillStyle = "#0f172a"; // Deep charcoal color text for crisp legibility
-        ctx.textAlign = "left";
-        ctx.textBaseline = "middle";
-
-        // Draw scrolling text
-        ctx.fillText(screenText, textX, 64);
-        // Draw wrapped instance for seamless scrolling
-        ctx.fillText(screenText, textX + scrollRange, 64);
+        texture.needsUpdate = true;
       }
-
-      texture.needsUpdate = true;
+    }
+    
+    if (canUpdateLcd) {
+      lastLcdUpdateMs = ms;
     }
 
     if (isCyber && starfield) {
