@@ -65,6 +65,7 @@ import {
   Mic,
   Sliders,
   Monitor,
+  WifiOff,
   Car,
   Bell,
   Video,
@@ -451,6 +452,8 @@ export default function App() {
   const [showQuitModal, setShowQuitModal] = useState(false);
 
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [showOfflineModal, setShowOfflineModal] = useState(false);
 
   // Fullscreen and Orientation Lock + Back Button Interception
   useEffect(() => {
@@ -458,6 +461,7 @@ export default function App() {
       setIsPortrait(window.innerHeight > window.innerWidth);
     };
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
 
     window.history.pushState({ noBackExitsApp: true }, '');
 
@@ -485,9 +489,8 @@ export default function App() {
     };
 
     const handleUserInteraction = () => {
+      setHasInteracted(true);
       enableImmersiveMode();
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
     };
 
     document.addEventListener('touchstart', handleUserInteraction, { once: true });
@@ -495,6 +498,7 @@ export default function App() {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
       window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('click', handleUserInteraction);
@@ -583,8 +587,14 @@ export default function App() {
   useEffect(() => {
     setIsOnline(navigator.onLine);
 
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = () => {
+      setIsOnline(true);
+      setShowOfflineModal(false);
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setShowOfflineModal(true);
+    };
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
@@ -1703,6 +1713,10 @@ export default function App() {
   };
 
   const handleLaunchMatch = async () => {
+    if (!isOnline && matchMode !== 'practice') {
+      setShowOfflineModal(true);
+      return;
+    }
     try {
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen();
@@ -1846,7 +1860,7 @@ export default function App() {
           position: 'fixed',
           inset: 0,
           backgroundImage: hasBgError ? 'radial-gradient(circle at 50% 30%, #111a2e 0%, #060c18 60%, #02050b 100%)' : `url(${bgImage})`,
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           color: '#ffffff', 
           fontFamily: 'Inter, system-ui, sans-serif',
@@ -1943,7 +1957,7 @@ export default function App() {
           position: 'fixed',
           inset: 0,
           backgroundImage: `url(/loginpage.png)`,
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           overflow: 'hidden',
           fontFamily: 'Inter, system-ui, sans-serif'
@@ -2344,7 +2358,7 @@ export default function App() {
           position: 'fixed',
           inset: 0,
           backgroundImage: 'url(/mainmenubg.png)',
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundColor: '#000000',
           overflow: 'hidden',
@@ -2352,12 +2366,12 @@ export default function App() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
-          padding: '40px 60px',
+          padding: 'env(safe-area-inset-top, 10px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px)',
           boxSizing: 'border-box'
         }}
       >
         {/* Empty layout, only bottom loading HUD is visible */}
-        <div style={{ width: '100%', maxWidth: 'min(90vw, 800px)', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           
           {/* Active Mode Name above the loading bar */}
           <div style={{ 
@@ -2630,7 +2644,7 @@ export default function App() {
           </div>
           
           {/* TOP BAR */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: 'env(safe-area-inset-top, 14px) env(safe-area-inset-right, 20px) 14px env(safe-area-inset-left, 20px)', background: 'linear-gradient(to bottom, rgba(3,8,20,0.8) 0%, rgba(3,8,20,0) 100%)', zIndex: 40 }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: 'env(safe-area-inset-top, 10px) env(safe-area-inset-right, 10px) 10px env(safe-area-inset-left, 10px)', background: 'linear-gradient(to bottom, rgba(3,8,20,0.8) 0%, rgba(3,8,20,0) 100%)', zIndex: 40 }}>
             
             {/* CYBERPUNK USER PROFILE BOX (Placed on Left) */}
             <div style={{ position: 'relative', pointerEvents: 'auto', marginLeft: '-11px', marginTop: '-11px' }}>
@@ -4051,6 +4065,9 @@ export default function App() {
                     position: 'absolute',
                     bottom: '25px',
                     right: '0px',
+                    marginLeft: '0px',
+                    marginTop: '0px',
+                    marginRight: '17px',
                     display: 'flex', 
                     flexDirection: 'column-reverse', // Start from bottom and grow upwards
                     gap: '5px' 
@@ -4199,6 +4216,7 @@ export default function App() {
                       style={{
                         width: '42px',
                         height: '20px',
+                        marginRight: '16px',
                         background: '#090a10',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         borderRadius: '2px',
@@ -6542,6 +6560,129 @@ export default function App() {
 
       <ScreenGate gateState={gateState} />
 
+      {/* NO INTERNET OVERLAY */}
+      {showOfflineModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(3, 8, 20, 0.98)',
+          zIndex: 3000000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '24px',
+          textAlign: 'center',
+          color: '#fff',
+          backdropFilter: 'blur(15px)'
+        }}>
+          <div style={{ 
+            width: '80px', 
+            height: '80px', 
+            borderRadius: '50%', 
+            background: 'rgba(255, 61, 61, 0.1)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginBottom: '24px',
+            border: '2px solid #ff3d3d'
+          }}>
+            <WifiOff size={40} color="#ff3d3d" />
+          </div>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: '#ff3d3d' }}>Connection Lost</h2>
+          <p style={{ color: '#8fa2c4', fontSize: '1.1rem', lineHeight: '1.5', maxWidth: '400px', marginBottom: '32px' }}>
+            It seems you are offline. You can still play <b>Practice Mode</b> offline, or wait for the connection to return.
+          </p>
+          
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button 
+              onClick={() => {
+                setMatchMode('practice');
+                setShowOfflineModal(false);
+                // Call launch logic for practice
+                setScreen('loading_match');
+              }}
+              style={{
+                padding: '16px 32px',
+                background: '#43f5ff',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                fontSize: '1rem',
+                boxShadow: '0 0 20px rgba(67, 245, 255, 0.3)'
+              }}
+            >
+              Play Offline
+            </button>
+            
+            <button 
+              onClick={() => setShowOfflineModal(false)}
+              style={{
+                padding: '16px 32px',
+                background: 'transparent',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                color: '#fff',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                textTransform: 'uppercase'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* INTERACTION GATE - Ensure Fullscreen & Audio */}
+      {!hasInteracted && !isPortrait && (
+        <div 
+          onClick={() => {
+            setHasInteracted(true);
+            const docEl = document.documentElement as any;
+            const requestFullscreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+            if (requestFullscreen) requestFullscreen.call(docEl).catch(() => {});
+          }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(3, 8, 20, 0.95)',
+            zIndex: 3000000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <div style={{ 
+            padding: '24px 48px', 
+            background: 'linear-gradient(135deg, #43f5ff 0%, #00d2ff 100%)', 
+            borderRadius: '12px',
+            color: '#000',
+            fontWeight: 900,
+            fontSize: '1.5rem',
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+            boxShadow: '0 0 30px rgba(67, 245, 255, 0.4)',
+            animation: 'pulse 2s infinite'
+          }}>
+            Tap to Play Fullscreen
+          </div>
+          <p style={{ color: '#8fa2c4', marginTop: '20px', fontFamily: 'Inter, sans-serif' }}>Click anywhere to enter Car Football Arena</p>
+          <style>{`
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(67, 245, 255, 0.4); }
+              50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(67, 245, 255, 0.6); }
+            }
+          `}</style>
+        </div>
+      )}
+
       {/* PORTRAIT OVERLAY - Force Landscape Experience */}
       {isPortrait && (
         <div style={{
@@ -6571,9 +6712,31 @@ export default function App() {
             <Monitor size={40} color="#43f5ff" style={{ transform: 'rotate(90deg)', animation: 'wiggle 2s ease-in-out infinite' }} />
           </div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Rotate Your Device</h2>
-          <p style={{ color: '#8fa2c4', fontSize: '1rem', lineHeight: '1.5', maxWidth: '300px' }}>
+          <p style={{ color: '#8fa2c4', fontSize: '1rem', lineHeight: '1.5', maxWidth: '300px', marginBottom: '24px' }}>
             Please rotate your phone to <b>Landscape Mode</b> to play Car Football Arena.
           </p>
+          
+          <button 
+            onClick={() => {
+              const docEl = document.documentElement as any;
+              const requestFullscreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen;
+              if (requestFullscreen) requestFullscreen.call(docEl).catch(() => {});
+              setHasInteracted(true);
+            }}
+            style={{
+              padding: '12px 24px',
+              background: 'transparent',
+              border: '1px solid #43f5ff',
+              color: '#43f5ff',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              textTransform: 'uppercase'
+            }}
+          >
+            I have rotated / Enter Fullscreen
+          </button>
+
           <style>{`
             @keyframes wiggle {
               0%, 100% { transform: rotate(90deg); }
