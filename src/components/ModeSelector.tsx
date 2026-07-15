@@ -54,7 +54,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onClose, onSelect, c
         className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-2 no-scrollbar overflow-hidden"
         style={{
           backgroundImage: 'url("/selectmode.png")',
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           fontFamily: '"Space Grotesk", sans-serif'
