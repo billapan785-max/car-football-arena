@@ -10,3 +10,8 @@ coverage/
 # Capacitor / Android
 # android/
 # ios/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
