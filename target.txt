@@ -1,0 +1,423 @@
+                {renderedActiveModal === 'settings' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    
+                    <div style={{ display: 'flex', gap: '16px', flex: 1, overflow: 'hidden' }}>
+                      {/* SIDEBAR TABS */}
+                      <div style={{ width: '110px', display: 'flex', flexDirection: 'column', gap: '2px', paddingRight: '8px', borderRight: '1px solid rgba(67, 245, 255, 0.1)' }}>
+                        {[
+                          { id: 'audio', icon: Volume2, label: 'Audio', color: '#43f5ff' },
+                          { id: 'controls', icon: Gamepad2, label: 'Controls', color: '#ff4d94' },
+                          { id: 'gameplay', icon: Car, label: 'Gameplay', color: '#ff4d94' },
+                          { id: 'graphics', icon: Monitor, label: 'Graphics', color: '#ff4d94' },
+                          { id: 'accessibility', icon: Settings, label: 'Accessibility', color: '#ff4d94' }
+                        ].map(tab => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setSettingsTab(tab.id as any)}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                              padding: '12px 4px',
+                              background: settingsTab === tab.id ? 'rgba(67, 245, 255, 0.08)' : 'transparent',
+                              border: 'none',
+                              borderLeft: settingsTab === tab.id ? '3px solid #43f5ff' : '3px solid transparent',
+                              color: settingsTab === tab.id ? tab.color : '#8fa2c4',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              borderRadius: '0 8px 8px 0',
+                              outline: 'none'
+                            }}
+                          >
+                            <tab.icon style={{ width: '28px', height: '28px', color: settingsTab === tab.id ? tab.color : '#ff4d94', filter: settingsTab === tab.id ? `drop-shadow(0 0 8px ${tab.color})` : 'none' }} />
+                            <span style={{ fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{tab.label}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* CONTENT AREA */}
+                      <div style={{ flex: 1, background: 'linear-gradient(135deg, rgba(8, 20, 35, 0.9), rgba(12, 28, 48, 0.9))', border: '1px solid rgba(67, 245, 255, 0.15)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
+                        
+                        {settingsTab === 'audio' && (
+                          <>
+                            {/* VOLUME MIXER PANEL */}
+                            <div style={{ display: 'flex', gap: '16px' }}>
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <span style={{ color: '#ffffff', fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Volume Mixer</span>
+                                
+                                {/* Sliders */}
+                                {[
+                                  { label: 'Sfx Volume', value: soundVolume, setter: setSoundVolume, store: 'soundVolume' },
+                                  { label: 'Music Volume', value: musicVolume, setter: setMusicVolume, store: 'musicVolume' },
+                                  { label: 'Engine Volume', value: engineVolume, setter: setEngineVolume, store: 'engineVolume' }
+                                ].map((item, idx) => (
+                                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ width: '100px', fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600 }}>{item.label}</span>
+                                    <input 
+                                      type="range" 
+                                      min="0" max="100" step="1"
+                                      value={item.value}
+                                      onChange={(e) => {
+                                        const v = parseInt(e.target.value);
+                                        item.setter(v);
+                                        localStorage.setItem(item.store, v.toString());
+                                      }}
+                                      style={{ flex: 1, accentColor: '#43f5ff', height: '4px', cursor: 'pointer' }}
+                                    />
+                                    <span style={{ width: '35px', textAlign: 'right', fontSize: '0.7rem', color: '#8fa2c4', fontWeight: 700 }}>{item.value}%</span>
+                                  </div>
+                                ))}
+
+                                {/* Checkboxes */}
+                                <div style={{ display: 'flex', gap: '24px', marginTop: '8px' }}>
+                                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                    <input 
+                                      type="checkbox" 
+                                      checked={masterVolume} 
+                                      onChange={(e) => { setMasterVolume(e.target.checked); localStorage.setItem('masterVolume', e.target.checked.toString()); }}
+                                      style={{ accentColor: '#43f5ff', width: '16px', height: '16px' }}
+                                    />
+                                    <span style={{ fontSize: '0.75rem', color: '#c4d1eb', fontWeight: 600 }}>Master Volume</span>
+                                  </label>
+                                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                    <input 
+                                      type="checkbox" 
+                                      checked={voiceChat} 
+                                      onChange={(e) => { setVoiceChat(e.target.checked); localStorage.setItem('voiceChat', e.target.checked.toString()); }}
+                                      style={{ accentColor: '#43f5ff', width: '16px', height: '16px' }}
+                                    />
+                                    <span style={{ fontSize: '0.75rem', color: '#c4d1eb', fontWeight: 600 }}>Voice Chat</span>
+                                  </label>
+                                </div>
+                              </div>
+                              
+                              {/* Graphic Placeholder (Right side image from mockup) */}
+                              <div style={{ width: '140px', height: '120px', background: 'radial-gradient(circle, rgba(67, 245, 255, 0.15) 0%, transparent 70%)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <div style={{ position: 'absolute', bottom: '10px', fontSize: '3rem', filter: 'drop-shadow(0 0 10px #ff4d94)' }}>🏎️</div>
+                                <div style={{ position: 'absolute', bottom: '15px', left: '10px', fontSize: '1.5rem', filter: 'drop-shadow(0 0 10px #43f5ff)' }}>⚽</div>
+                                {/* soundwave placeholder */}
+                                <div style={{ position: 'absolute', top: '20px', left: '10px', right: '10px', height: '40px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '2px', opacity: 0.5 }}>
+                                  {[1,3,5,4,2,4,6,8,5,3,4,6,3,2,4].map((h, i) => (
+                                    <div key={i} style={{ width: '4px', height: `${h*4}px`, background: i%2===0?'#ff4d94':'#43f5ff', borderRadius: '2px' }} />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <hr style={{ border: 'none', borderTop: '1px solid rgba(67, 245, 255, 0.1)', margin: '4px 0' }} />
+
+                            {/* ROW 2: Layout Preset */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                              <Gamepad2 style={{ width: '42px', height: '42px', color: '#43f5ff', opacity: 0.5 }} />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600, width: '100px' }}>LAYOUT PRESET</span>
+                                <select 
+                                  value={layoutPreset}
+                                  onChange={(e) => setLayoutPreset(e.target.value)}
+                                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(67, 245, 255, 0.3)', color: '#43f5ff', padding: '6px 12px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, outline: 'none', cursor: 'pointer', flex: 1 }}
+                                >
+                                  <option value="Default">Default</option>
+                                  <option value="Custom 1">Custom 1</option>
+                                  <option value="Pro Controller">Pro Controller</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* ROW 3: HUD Scale & Auto Boost */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600, width: '100px' }}>HUD SCALE</span>
+                                <input 
+                                  type="range" 
+                                  min="50" max="150" step="1"
+                                  value={hudScale}
+                                  onChange={(e) => {
+                                    const v = parseInt(e.target.value);
+                                    setHudScale(v);
+                                    localStorage.setItem('hudScale', v.toString());
+                                  }}
+                                  style={{ flex: 1, accentColor: '#43f5ff', height: '4px', cursor: 'pointer' }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '140px' }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600 }}>AUTO BOOST</span>
+                                {/* Toggle switch */}
+                                <div 
+                                  onClick={() => { setAutoBoost(!autoBoost); localStorage.setItem('autoBoost', (!autoBoost).toString()); }}
+                                  style={{ width: '36px', height: '18px', background: autoBoost ? '#43f5ff' : 'rgba(255,255,255,0.1)', borderRadius: '10px', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '2px', left: autoBoost ? '20px' : '2px', width: '14px', height: '14px', background: '#0a1329', borderRadius: '50%', transition: 'left 0.2s' }} />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* ROW 4: Quality & Resolution */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600, width: '100px' }}>QUALITY PRESET</span>
+                                <div style={{ display: 'flex', border: '1px solid rgba(67, 245, 255, 0.2)', borderRadius: '4px', overflow: 'hidden' }}>
+                                  {(['Low', 'Medium', 'High', 'Ultra'] as const).map(q => (
+                                    <button
+                                      key={q}
+                                      onClick={() => setQualityPreset(q)}
+                                      style={{
+                                        background: qualityPreset === q ? 'rgba(67, 245, 255, 0.15)' : 'transparent',
+                                        color: qualityPreset === q ? '#43f5ff' : '#8fa2c4',
+                                        border: 'none',
+                                        padding: '4px 8px',
+                                        fontSize: '0.65rem',
+                                        fontWeight: 700,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        textShadow: qualityPreset === q ? '0 0 5px rgba(67,245,255,0.5)' : 'none'
+                                      }}
+                                    >
+                                      {q}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '180px' }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600 }}>RESOLUTION</span>
+                                <select 
+                                  value={resolution}
+                                  onChange={(e) => setResolution(e.target.value)}
+                                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(67, 245, 255, 0.3)', color: '#43f5ff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700, outline: 'none', cursor: 'pointer', flex: 1 }}
+                                >
+                                  <option value="1280x720">1280x720</option>
+                                  <option value="1920x1080">1920x1080</option>
+                                  <option value="2560x1440">2560x1440</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* ROW 5: Color Blind Mode & Subtitle Size */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600, width: '100px' }}>COLOR BLIND MODE</span>
+                                {/* Toggle switch */}
+                                <div 
+                                  onClick={() => setColorBlindMode(!colorBlindMode)}
+                                  style={{ width: '36px', height: '18px', background: colorBlindMode ? '#43f5ff' : 'rgba(255,255,255,0.1)', borderRadius: '10px', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '2px', left: colorBlindMode ? '20px' : '2px', width: '14px', height: '14px', background: '#0a1329', borderRadius: '50%', transition: 'left 0.2s' }} />
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '180px' }}>
+                                <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 600 }}>SUBTITLE SIZE</span>
+                                <select 
+                                  value={subtitleSize}
+                                  onChange={(e) => setSubtitleSize(e.target.value)}
+                                  style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(67, 245, 255, 0.3)', color: '#43f5ff', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700, outline: 'none', cursor: 'pointer', flex: 1 }}
+                                >
+                                  <option value="Small">Small</option>
+                                  <option value="Medium">Medium</option>
+                                  <option value="Large">Large</option>
+                                </select>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {settingsTab === 'controls' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <span style={{ color: '#ffffff', fontSize: '0.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>Mobile Controls Customization</span>
+                            
+                            {/* Device Motion Steering */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.25)', padding: '10px 12px', border: '1px solid rgba(67,245,255,0.1)', borderRadius: '8px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', color: '#ffffff' }}>Mobile Motion Control (Tilt)</span>
+                                <span style={{ fontSize: '0.65rem', color: '#8fa2c4' }}>Steer by tilting your device left/right</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const newVal = !tiltControlsEnabled;
+                                  setTiltControlsEnabled(newVal);
+                                  localStorage.setItem('tiltControlsEnabled', newVal.toString());
+                                }}
+                                style={{
+                                  background: tiltControlsEnabled ? '#00e575' : 'rgba(255,255,255,0.08)',
+                                  border: 'none',
+                                  borderRadius: '20px',
+                                  padding: '6px 16px',
+                                  color: tiltControlsEnabled ? '#000000' : '#8fa2c4',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 900,
+                                  cursor: 'pointer',
+                                  boxShadow: tiltControlsEnabled ? '0 0 10px rgba(0,229,117,0.5)' : 'none',
+                                  transition: 'all 0.2s',
+                                  outline: 'none'
+                                }}
+                              >
+                                {tiltControlsEnabled ? 'ACTIVE' : 'OFF'}
+                              </button>
+                            </div>
+
+                            {/* Touch screen controls toggle */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.25)', padding: '10px 12px', border: '1px solid rgba(67,245,255,0.1)', borderRadius: '8px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', color: '#ffffff' }}>On-Screen HUD Buttons</span>
+                                <span style={{ fontSize: '0.65rem', color: '#8fa2c4' }}>Show virtual buttons for playing</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const newVal = !mobileControlsEnabled;
+                                  setMobileControlsEnabled(newVal);
+                                  localStorage.setItem('mobileControlsEnabled', newVal.toString());
+                                }}
+                                style={{
+                                  background: mobileControlsEnabled ? '#43f5ff' : 'rgba(255,255,255,0.08)',
+                                  border: 'none',
+                                  borderRadius: '20px',
+                                  padding: '6px 16px',
+                                  color: mobileControlsEnabled ? '#000000' : '#8fa2c4',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 900,
+                                  cursor: 'pointer',
+                                  boxShadow: mobileControlsEnabled ? '0 0 10px rgba(67,245,255,0.4)' : 'none',
+                                  transition: 'all 0.2s',
+                                  outline: 'none'
+                                }}
+                              >
+                                {mobileControlsEnabled ? 'ENABLED' : 'HIDDEN'}
+                              </button>
+                            </div>
+
+                            {mobileControlsEnabled && (
+                              <div style={{ display: 'flex', gap: '16px' }}>
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                  {/* Mobile Controls Opacity Slider */}
+                                  <div style={{ background: 'rgba(0,0,0,0.25)', padding: '10px 12px', border: '1px solid rgba(67,245,255,0.1)', borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.7rem' }}>
+                                      <span style={{ fontWeight: 600, color: '#c4d1eb' }}>Button Opacity:</span>
+                                      <span style={{ color: '#43f5ff', fontWeight: 700 }}>{mobileControlsOpacity}%</span>
+                                    </div>
+                                    <input 
+                                      type="range" 
+                                      min="10" 
+                                      max="100" 
+                                      step="1"
+                                      value={mobileControlsOpacity} 
+                                      onChange={(e) => {
+                                        const val = parseInt(e.target.value);
+                                        setMobileControlsOpacity(val);
+                                        localStorage.setItem('mobileControlsOpacity', val.toString());
+                                      }}
+                                      style={{ width: '100%', accentColor: '#43f5ff', height: '4px', cursor: 'pointer' }}
+                                    />
+                                  </div>
+
+                                  {/* Selected button selector */}
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <span style={{ fontSize: '0.7rem', color: '#c4d1eb', fontWeight: 800, textTransform: 'uppercase' }}>Select Button to Reposition:</span>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                      {[
+                                        { id: 'steerLeft', label: '◀ Left' },
+                                        { id: 'steerRight', label: '▶ Right' },
+                                        { id: 'forward', label: '▲ Throttle' },
+                                        { id: 'reverse', label: '▼ Reverse' },
+                                        { id: 'boost', label: '⚡ Boost' },
+                                        { id: 'jump', label: '🚀 Jump' }
+                                      ].map((btn) => {
+                                        if (tiltControlsEnabled && (btn.id === 'steerLeft' || btn.id === 'steerRight')) {
+                                          return null;
+                                        }
+                                        return (
+                                          <button
+                                            key={btn.id}
+                                            onClick={() => setSelectedHudBtn(btn.id)}
+                                            style={{
+                                              flex: '1 1 30%',
+                                              padding: '6px 4px',
+                                              background: selectedHudBtn === btn.id ? '#43f5ff' : 'rgba(255,255,255,0.05)',
+                                              border: '1px solid',
+                                              borderColor: selectedHudBtn === btn.id ? '#43f5ff' : 'rgba(67, 245, 255, 0.15)',
+                                              color: selectedHudBtn === btn.id ? '#000000' : '#ffffff',
+                                              fontWeight: 800,
+                                              fontSize: '0.65rem',
+                                              borderRadius: '4px',
+                                              cursor: 'pointer',
+                                              transition: 'all 0.15s',
+                                              outline: 'none'
+                                            }}
+                                          >
+                                            {btn.label}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+
+                                  {/* Position Sliders */}
+                                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', border: '1px solid rgba(67, 245, 255, 0.1)', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <span style={{ fontSize: '0.7rem', color: '#ffd32a', fontWeight: 800, textTransform: 'uppercase' }}>
+                                      Positioning: {selectedHudBtn.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                                    </span>
+                                    
+                                    <div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', marginBottom: '4px', color: '#c4d1eb' }}>
+                                        <span>Horizontal Alignment (X):</span>
+                                        <span style={{ color: '#43f5ff', fontWeight: 800 }}>{btnPositions[selectedHudBtn]?.x || 0}%</span>
+                                      </div>
+                                      <input
+                                        type="range" min="2" max="95" step="1"
+                                        value={btnPositions[selectedHudBtn]?.x || 0}
+                                        onChange={(e) => {
+                                          const newPos = { ...btnPositions };
+                                          newPos[selectedHudBtn] = { ...newPos[selectedHudBtn], x: parseInt(e.target.value) };
+                                          setBtnPositions(newPos);
+                                        }}
+                                        style={{ width: '100%', accentColor: '#ffd32a', height: '4px', cursor: 'pointer' }}
+                                      />
+                                    </div>
+
+                                    <div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', marginBottom: '4px', color: '#c4d1eb' }}>
+                                        <span>Vertical Alignment (Y):</span>
+                                        <span style={{ color: '#43f5ff', fontWeight: 800 }}>{btnPositions[selectedHudBtn]?.y || 0}%</span>
+                                      </div>
+                                      <input
+                                        type="range" min="2" max="90" step="1"
+                                        value={btnPositions[selectedHudBtn]?.y || 0}
+                                        onChange={(e) => {
+                                          const newPos = { ...btnPositions };
+                                          newPos[selectedHudBtn] = { ...newPos[selectedHudBtn], y: parseInt(e.target.value) };
+                                          setBtnPositions(newPos);
+                                        }}
+                                        style={{ width: '100%', accentColor: '#ffd32a', height: '4px', cursor: 'pointer' }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {/* Right side preview and buttons */}
+                                <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  <span style={{ fontSize: '0.7rem', color: '#8fa2c4', fontWeight: 800, textTransform: 'uppercase' }}>
+                                    Preview
+                                  </span>
+                                  <div style={{
+                                    width: '100%',
+                                    height: '100px',
+                                    background: '#020617',
+                                    border: '1.5px dashed rgba(67, 245, 255, 0.4)',
+                                    borderRadius: '8px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    boxShadow: 'inset 0 0 15px rgba(0,0,0,0.8)'
+                                  }}>
+                                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(67, 245, 255, 0.08) 1px, transparent 0)', backgroundSize: '12px 12px', pointerEvents: 'none' }} />
+                                    <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', borderLeft: '1px dashed rgba(255,255,255,0.06)' }} />
+                                    {Object.entries(btnPositions).map(([id, posVal]) => {
+                                      if (tiltControlsEnabled && (id === 'steerLeft' || id === 'steerRight')) {
+                                        return null;
+                                      }
+                                      const pos = posVal as { x: number, y: number };
+                                      const isActive = selectedHudBtn === id;
+                                      const labels: Record<string, string> = { steerLeft: '◀', steerRight: '▶', forward: '▲', reverse: '▼', boost: '⚡', jump: '🚀' };
+                                      return (
+                                        <div
+                                          key={id}
+                                          style={{
+                                            position: 'absolute',

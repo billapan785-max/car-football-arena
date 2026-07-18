@@ -1,0 +1,111 @@
+{
+  "entities": {
+    "online_player": {
+      "title": "OnlinePlayer",
+      "description": "Lobby presence tracking for active players",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "lastSeen": { "type": "integer" },
+        "status": { "type": "string", "enum": ["online", "offline"] }
+      },
+      "required": ["uid", "displayName", "lastSeen"]
+    },
+    "lobby_teams": {
+      "title": "LobbyTeams",
+      "description": "Team formation and matchmaking status of a lobby group",
+      "type": "object",
+      "properties": {
+        "hostId": { "type": "string" },
+        "hostName": { "type": "string" },
+        "blue": { "type": "array" },
+        "orange": { "type": "array" },
+        "status": { "type": "string", "enum": ["waiting", "ready", "playing", "finished"] },
+        "timestamp": { "type": "integer" }
+      },
+      "required": ["hostId", "blue", "orange", "status"]
+    },
+    "lobby_invitation": {
+      "title": "LobbyInvitation",
+      "description": "Match request from host to another online player",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fromId": { "type": "string" },
+        "fromName": { "type": "string" },
+        "toId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "timestamp": { "type": "integer" }
+      },
+      "required": ["id", "fromId", "fromName", "toId", "status"]
+    },
+    "user_profile": {
+      "title": "UserProfile",
+      "description": "Registered player details for friends search",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "lastSeen": { "type": "integer" }
+      },
+      "required": ["uid", "displayName", "lastSeen"]
+    },
+    "friend_profile": {
+      "title": "FriendProfile",
+      "description": "Friend reference linked to a user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "addedAt": { "type": "integer" }
+      },
+      "required": ["uid", "displayName", "addedAt"]
+    },
+    "friend_request": {
+      "title": "FriendRequest",
+      "description": "Friend request document linking sender and receiver",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fromId": { "type": "string" },
+        "fromName": { "type": "string" },
+        "fromPhoto": { "type": "string" },
+        "toId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "timestamp": { "type": "integer" }
+      },
+      "required": ["id", "fromId", "fromName", "toId", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "online_players/{uid}": {
+      "schema": { "$ref": "#/entities/online_player" },
+      "description": "Saves active online presence records"
+    },
+    "lobby_teams/{lobbyId}": {
+      "schema": { "$ref": "#/entities/lobby_teams" },
+      "description": "Stores host's matchmaking lobby state"
+    },
+    "lobby_invitations/{inviteId}": {
+      "schema": { "$ref": "#/entities/lobby_invitation" },
+      "description": "Tracks sent match invitations"
+    },
+    "users/{uid}": {
+      "schema": { "$ref": "#/entities/user_profile" },
+      "description": "Stores general user records for profile retrieval"
+    },
+    "users/{uid}/friends/{friendId}": {
+      "schema": { "$ref": "#/entities/friend_profile" },
+      "description": "User's friends subcollection"
+    },
+    "friend_requests/{requestId}": {
+      "schema": { "$ref": "#/entities/friend_request" },
+      "description": "Friend request collection"
+    }
+  }
+}

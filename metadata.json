@@ -1,0 +1,6 @@
+{
+  "name": "Car Football Arena",
+  "description": "A 3D rocket car soccer game built with Three.js.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
