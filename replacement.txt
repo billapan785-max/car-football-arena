@@ -1,0 +1,413 @@
+                      {/* CONTENT AREA */}
+                      <div style={{ flex: 1, background: 'linear-gradient(135deg, rgba(5, 12, 25, 0.95), rgba(10, 18, 35, 0.95))', border: '1px solid rgba(67, 245, 255, 0.25)', boxShadow: 'inset 0 0 30px rgba(67, 245, 255, 0.05)', borderRadius: '12px', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }}>
+                        
+                        {settingsTab === 'in-match' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>In-Match Settings</span>
+                            
+                            <div style={{ display: 'flex', gap: '32px' }}>
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                {/* Sensitivity Slider */}
+                                <div style={{ background: 'rgba(0,0,0,0.4)', padding: '20px', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', fontSize: '0.85rem' }}>
+                                    <span style={{ fontWeight: 700, color: '#c4d1eb', textTransform: 'uppercase', letterSpacing: '1px' }}>Steering Sensitivity:</span>
+                                    <span style={{ color: '#43f5ff', fontWeight: 900, textShadow: '0 0 8px rgba(67, 245, 255, 0.4)' }}>{sensitivity}%</span>
+                                  </div>
+                                  <input 
+                                    type="range" min="1" max="100" step="1" value={sensitivity}
+                                    onChange={(e) => {
+                                      const val = parseInt(e.target.value);
+                                      setSensitivity(val);
+                                      localStorage.setItem('sensitivity', val.toString());
+                                    }}
+                                    style={{ width: '100%', accentColor: '#43f5ff', height: '6px', cursor: 'pointer', filter: 'drop-shadow(0 0 5px rgba(67, 245, 255, 0.5))' }}
+                                  />
+                                </div>
+
+                                {/* HUD Buttons Customization Header */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  <span style={{ fontSize: '0.9rem', color: '#ffd32a', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px', textShadow: '0 0 8px rgba(255, 211, 42, 0.4)' }}>HUD Button Layout</span>
+                                  <p style={{ fontSize: '0.75rem', color: '#8fa2c4', margin: 0 }}>Select a button below and adjust its position using the sliders, or preview it on the right.</p>
+                                </div>
+
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                  {[
+                                    { id: 'steerLeft', label: '◀ Steer Left' },
+                                    { id: 'steerRight', label: '▶ Steer Right' },
+                                    { id: 'forward', label: '▲ Throttle' },
+                                    { id: 'reverse', label: '▼ Reverse' },
+                                    { id: 'boost', label: '⚡ Boost' },
+                                    { id: 'jump', label: '🚀 Jump' }
+                                  ].map((btn) => (
+                                    <button
+                                      key={btn.id}
+                                      onClick={() => setSelectedHudBtn(btn.id)}
+                                      style={{
+                                        padding: '10px 16px',
+                                        background: selectedHudBtn === btn.id ? 'linear-gradient(90deg, #00d2ff, #43f5ff)' : 'rgba(0,0,0,0.3)',
+                                        border: '1px solid',
+                                        borderColor: selectedHudBtn === btn.id ? '#ffffff' : 'rgba(67, 245, 255, 0.2)',
+                                        color: selectedHudBtn === btn.id ? '#000000' : '#c4d1eb',
+                                        fontWeight: 900,
+                                        fontSize: '0.75rem',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        boxShadow: selectedHudBtn === btn.id ? '0 0 15px rgba(67, 245, 255, 0.4)' : 'none',
+                                        outline: 'none',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px'
+                                      }}
+                                    >
+                                      {btn.label}
+                                    </button>
+                                  ))}
+                                </div>
+
+                                {/* Position Sliders */}
+                                <div style={{ background: 'rgba(0,0,0,0.4)', padding: '20px', border: '1px solid rgba(67, 245, 255, 0.15)', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)' }}>
+                                  <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '12px', color: '#c4d1eb' }}>
+                                      <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Horizontal Position (X-Axis):</span>
+                                      <span style={{ color: '#43f5ff', fontWeight: 900, textShadow: '0 0 8px rgba(67, 245, 255, 0.4)' }}>{btnPositions[selectedHudBtn]?.x || 0}%</span>
+                                    </div>
+                                    <input
+                                      type="range" min="2" max="95" step="1"
+                                      value={btnPositions[selectedHudBtn]?.x || 0}
+                                      onChange={(e) => {
+                                        const newPos = { ...btnPositions };
+                                        newPos[selectedHudBtn] = { ...newPos[selectedHudBtn], x: parseInt(e.target.value) };
+                                        setBtnPositions(newPos);
+                                        localStorage.setItem('mobileBtnPositions', JSON.stringify(newPos));
+                                      }}
+                                      style={{ width: '100%', accentColor: '#ffd32a', height: '6px', cursor: 'pointer', filter: 'drop-shadow(0 0 5px rgba(255, 211, 42, 0.5))' }}
+                                    />
+                                  </div>
+                                  <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '12px', color: '#c4d1eb' }}>
+                                      <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Vertical Position (Y-Axis):</span>
+                                      <span style={{ color: '#43f5ff', fontWeight: 900, textShadow: '0 0 8px rgba(67, 245, 255, 0.4)' }}>{btnPositions[selectedHudBtn]?.y || 0}%</span>
+                                    </div>
+                                    <input
+                                      type="range" min="2" max="90" step="1"
+                                      value={btnPositions[selectedHudBtn]?.y || 0}
+                                      onChange={(e) => {
+                                        const newPos = { ...btnPositions };
+                                        newPos[selectedHudBtn] = { ...newPos[selectedHudBtn], y: parseInt(e.target.value) };
+                                        setBtnPositions(newPos);
+                                        localStorage.setItem('mobileBtnPositions', JSON.stringify(newPos));
+                                      }}
+                                      style={{ width: '100%', accentColor: '#ffd32a', height: '6px', cursor: 'pointer', filter: 'drop-shadow(0 0 5px rgba(255, 211, 42, 0.5))' }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Right side preview */}
+                              <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <span style={{ fontSize: '0.9rem', color: '#8fa2c4', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>Layout Preview</span>
+                                <div style={{
+                                  width: '100%',
+                                  height: '180px',
+                                  background: '#02050a',
+                                  border: '2px solid rgba(67, 245, 255, 0.3)',
+                                  borderRadius: '12px',
+                                  position: 'relative',
+                                  overflow: 'hidden',
+                                  boxShadow: 'inset 0 0 30px rgba(0,0,0,0.9), 0 0 20px rgba(67, 245, 255, 0.1)'
+                                }}>
+                                  <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(67, 245, 255, 0.15) 1px, transparent 0)', backgroundSize: '20px 20px', pointerEvents: 'none' }} />
+                                  <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', borderLeft: '1px dashed rgba(67, 245, 255, 0.2)' }} />
+                                  <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', borderTop: '1px dashed rgba(67, 245, 255, 0.2)' }} />
+                                  {Object.entries(btnPositions).map(([id, posVal]) => {
+                                    const pos = posVal as { x: number, y: number };
+                                    const isActive = selectedHudBtn === id;
+                                    const labels: Record<string, string> = { steerLeft: '◀', steerRight: '▶', forward: '▲', reverse: '▼', boost: '⚡', jump: '🚀' };
+                                    return (
+                                      <div
+                                        key={id}
+                                        style={{
+                                          position: 'absolute',
+                                          left: `${pos.x}%`,
+                                          bottom: `${pos.y}%`,
+                                          transform: 'translate(-50%, 50%)',
+                                          width: isActive ? '40px' : '30px', 
+                                          height: isActive ? '40px' : '30px', 
+                                          borderRadius: '50%',
+                                          background: isActive ? 'linear-gradient(135deg, #00d2ff, #43f5ff)' : 'rgba(10, 19, 41, 0.8)',
+                                          border: isActive ? '2px solid #ffffff' : '1px solid rgba(67, 245, 255, 0.3)',
+                                          color: isActive ? '#000000' : '#43f5ff',
+                                          fontSize: '14px', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                          boxShadow: isActive ? '0 0 20px rgba(67, 245, 255, 0.8)' : '0 0 10px rgba(0,0,0,0.5)', zIndex: isActive ? 10 : 2,
+                                          transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                                        }}
+                                      >
+                                        {labels[id]}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  <button
+                                    onClick={() => {
+                                      const defaults = { steerLeft: { x: 10, y: 25 }, steerRight: { x: 25, y: 25 }, forward: { x: 80, y: 40 }, reverse: { x: 80, y: 15 }, boost: { x: 92, y: 40 }, jump: { x: 92, y: 15 } };
+                                      setBtnPositions(defaults);
+                                      localStorage.setItem('mobileBtnPositions', JSON.stringify(defaults));
+                                    }}
+                                    style={{
+                                      background: 'rgba(255, 77, 148, 0.1)', border: '1px solid rgba(255, 77, 148, 0.4)', borderRadius: '8px', color: '#ff4d94', padding: '14px', fontSize: '0.85rem', fontWeight: 800, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', textTransform: 'uppercase', letterSpacing: '1px'
+                                    }}
+                                    onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255, 77, 148, 0.2)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 77, 148, 0.3)'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 77, 148, 0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                                  >
+                                    Reset to Default Layout
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsTab === 'display' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>Display Settings</span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(0,0,0,0.3)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                <span style={{ fontSize: '0.9rem', color: '#c4d1eb', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>Graphics Quality</span>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+                                  {(['Smooth', 'Standard', 'Ultra', 'Max'] as const).map(q => (
+                                    <button
+                                      key={q}
+                                      onClick={() => setQualityPreset(q as any)}
+                                      style={{
+                                        background: qualityPreset === q ? 'linear-gradient(135deg, #00d2ff, #43f5ff)' : 'rgba(0,0,0,0.4)',
+                                        color: qualityPreset === q ? '#000000' : '#8fa2c4',
+                                        border: '1px solid',
+                                        borderColor: qualityPreset === q ? '#ffffff' : 'rgba(67,245,255,0.2)',
+                                        padding: '16px 8px',
+                                        borderRadius: '8px',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 900,
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        boxShadow: qualityPreset === q ? '0 0 20px rgba(67,245,255,0.5)' : 'none',
+                                        transition: 'all 0.2s',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px'
+                                      }}
+                                    >
+                                      {q}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '20px 24px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Color Blind Mode</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#8fa2c4' }}>Adjust neon colors for better visibility</span>
+                                </div>
+                                <div 
+                                  onClick={() => setColorBlindMode(!colorBlindMode)}
+                                  style={{ width: '56px', height: '28px', background: colorBlindMode ? '#43f5ff' : 'rgba(0,0,0,0.5)', borderRadius: '14px', border: '1px solid rgba(67,245,255,0.3)', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', boxShadow: colorBlindMode ? '0 0 15px rgba(67,245,255,0.4)' : 'none' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '3px', left: colorBlindMode ? '31px' : '3px', width: '20px', height: '20px', background: colorBlindMode ? '#0a1329' : '#8fa2c4', borderRadius: '50%', transition: 'left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsTab === 'sound' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>Audio Config</span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+                              
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '20px 24px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Master Sound</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#8fa2c4' }}>Toggle all game sounds globally</span>
+                                </div>
+                                <div 
+                                  onClick={() => { setMasterVolume(!masterVolume); localStorage.setItem('masterVolume', (!masterVolume).toString()); }}
+                                  style={{ width: '56px', height: '28px', background: masterVolume ? '#43f5ff' : 'rgba(0,0,0,0.5)', borderRadius: '14px', border: '1px solid rgba(67,245,255,0.3)', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', boxShadow: masterVolume ? '0 0 15px rgba(67,245,255,0.4)' : 'none' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '3px', left: masterVolume ? '31px' : '3px', width: '20px', height: '20px', background: masterVolume ? '#0a1329' : '#8fa2c4', borderRadius: '50%', transition: 'left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }} />
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', background: 'rgba(0,0,0,0.3)', padding: '28px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                {[
+                                  { label: 'Background Music Volume', value: musicVolume, setter: setMusicVolume, store: 'musicVolume' },
+                                  { label: 'Sound Effects (SFX)', value: soundVolume, setter: setSoundVolume, store: 'soundVolume' },
+                                  { label: 'Engine Sound', value: engineVolume, setter: setEngineVolume, store: 'engineVolume' }
+                                ].map((item, idx) => (
+                                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <span style={{ fontSize: '0.85rem', color: '#c4d1eb', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{item.label}</span>
+                                      <span style={{ fontSize: '0.85rem', color: '#43f5ff', fontWeight: 900, textShadow: '0 0 8px rgba(67, 245, 255, 0.4)' }}>{item.value}%</span>
+                                    </div>
+                                    <input 
+                                      type="range" 
+                                      min="0" max="100" step="1"
+                                      value={item.value}
+                                      onChange={(e) => {
+                                        const v = parseInt(e.target.value);
+                                        item.setter(v);
+                                        localStorage.setItem(item.store, v.toString());
+                                      }}
+                                      style={{ width: '100%', accentColor: '#ffd32a', height: '6px', cursor: 'pointer', opacity: masterVolume ? 1 : 0.4, pointerEvents: masterVolume ? 'auto' : 'none', filter: 'drop-shadow(0 0 5px rgba(255, 211, 42, 0.5))' }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsTab === 'recording' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>Recording Config</span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
+                              <div style={{ background: 'linear-gradient(135deg, rgba(0, 229, 117, 0.15), rgba(0, 229, 117, 0.05))', border: '1px solid rgba(0, 229, 117, 0.4)', borderRadius: '12px', padding: '24px', display: 'flex', gap: '20px', alignItems: 'flex-start', boxShadow: 'inset 0 0 20px rgba(0, 229, 117, 0.1)' }}>
+                                <Video style={{ width: '32px', height: '32px', color: '#00e575', flexShrink: 0, filter: 'drop-shadow(0 0 8px rgba(0, 229, 117, 0.6))' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                  <span style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>Match Recording</span>
+                                  <span style={{ color: '#8fa2c4', fontSize: '0.8rem', lineHeight: '1.6' }}>When enabled, all your matches will be automatically recorded and saved locally to your device's gallery. This feature requires Gallery / Storage permissions to save video files.</span>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '20px 24px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>Auto-Record Matches</span>
+                                  <span style={{ fontSize: '0.75rem', color: '#8fa2c4' }}>Save gameplay to device gallery</span>
+                                </div>
+                                <div 
+                                  onClick={() => {
+                                    if (!recordingEnabled) {
+                                      const confirm = window.confirm('Game needs permission to access your Gallery to save match recordings. Allow?');
+                                      if (confirm) {
+                                        setRecordingEnabled(true);
+                                        localStorage.setItem('recordingEnabled', 'true');
+                                      }
+                                    } else {
+                                      setRecordingEnabled(false);
+                                      localStorage.setItem('recordingEnabled', 'false');
+                                    }
+                                  }}
+                                  style={{ width: '56px', height: '28px', background: recordingEnabled ? '#00e575' : 'rgba(0,0,0,0.5)', borderRadius: '14px', border: '1px solid rgba(0, 229, 117, 0.3)', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', boxShadow: recordingEnabled ? '0 0 15px rgba(0,229,117,0.4)' : 'none' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '3px', left: recordingEnabled ? '31px' : '3px', width: '20px', height: '20px', background: recordingEnabled ? '#0a1329' : '#8fa2c4', borderRadius: '50%', transition: 'left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsTab === 'notification' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>Notifications</span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(67,245,255,0.15)' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px' }}>General Notifications</span>
+                                  <span style={{ fontSize: '0.8rem', color: '#8fa2c4', lineHeight: '1.5', maxWidth: '80%' }}>Enable or disable general stadium alerts (friend logins, matchmaking ready, new updates).</span>
+                                </div>
+                                <div 
+                                  onClick={() => {
+                                    const val = !generalNotifications;
+                                    setGeneralNotifications(val);
+                                    localStorage.setItem('generalNotifications', val.toString());
+                                  }}
+                                  style={{ width: '56px', height: '28px', background: generalNotifications ? '#bf5aff' : 'rgba(0,0,0,0.5)', borderRadius: '14px', border: '1px solid rgba(191, 90, 255, 0.3)', position: 'relative', cursor: 'pointer', transition: 'all 0.2s', boxShadow: generalNotifications ? '0 0 15px rgba(191, 90, 255, 0.4)' : 'none' }}
+                                >
+                                  <div style={{ position: 'absolute', top: '3px', left: generalNotifications ? '31px' : '3px', width: '20px', height: '20px', background: generalNotifications ? '#0a1329' : '#8fa2c4', borderRadius: '50%', transition: 'left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsTab === 'account' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', height: '100%', animation: 'fadeIn 0.3s ease-out' }}>
+                            <span style={{ color: '#ffffff', fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', textShadow: '0 0 10px rgba(67, 245, 255, 0.5)' }}>Account Portal</span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '600px' }}>
+                              
+                              {/* Account Info Card */}
+                              <div style={{ background: 'linear-gradient(135deg, rgba(67, 245, 255, 0.15), rgba(0,0,0,0.6))', padding: '28px', borderRadius: '16px', border: '1px solid rgba(67,245,255,0.3)', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: 'inset 0 0 20px rgba(67, 245, 255, 0.05)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                  <div style={{ width: '68px', height: '68px', borderRadius: '50%', background: '#0a1329', border: '2px solid #43f5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 15px rgba(67, 245, 255, 0.3)' }}>
+                                    <User style={{ width: '32px', height: '32px', color: '#43f5ff' }} />
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    <span style={{ color: '#ffffff', fontSize: '1.3rem', fontWeight: 900, letterSpacing: '0.5px' }}>{user ? user.displayName || 'Guest Player' : 'Not Logged In'}</span>
+                                    <span style={{ color: '#8fa2c4', fontSize: '0.85rem' }}>Linked ID: <span style={{ color: '#c4d1eb' }}>{user ? user.email || 'Anonymous' : 'None'}</span></span>
+                                  </div>
+                                </div>
+                                {user && (
+                                  <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '8px 16px', borderRadius: '6px', fontSize: '0.75rem', color: '#ffd32a', fontWeight: 900, textTransform: 'uppercase', border: '1px solid rgba(255, 211, 42, 0.2)' }}>
+                                      UID: {user.uid.substring(0, 10)}...
+                                    </div>
+                                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '8px 16px', borderRadius: '6px', fontSize: '0.75rem', color: '#00e575', fontWeight: 900, textTransform: 'uppercase', border: '1px solid rgba(0, 229, 117, 0.2)' }}>
+                                      Verified Cyber-Racer
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Action Links */}
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                <button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>
+                                  📜 Terms & Services
+                                </button>
+                                <button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>
+                                  🛡️ Privacy Policy
+                                </button>
+                                <button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>
+                                  🔐 Game Permissions
+                                </button>
+                                <button style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#ef4444', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.2)'; e.currentTarget.style.boxShadow='0 0 10px rgba(239, 68, 68, 0.3)'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.1)'; e.currentTarget.style.boxShadow='none'; }}>
+                                  ⚠️ Delete Account
+                                </button>
+                              </div>
+
+                              <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', gap: '16px' }}>
+                                {user ? (
+                                  <button
+                                    onClick={() => auth.signOut()}
+                                    style={{
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                      width: '100%', padding: '18px', background: 'rgba(255, 77, 148, 0.15)', border: '1px solid rgba(255, 77, 148, 0.5)',
+                                      borderRadius: '12px', color: '#ff4d94', fontSize: '0.95rem', fontWeight: 900, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', textTransform: 'uppercase', letterSpacing: '1px'
+                                    }}
+                                    onMouseOver={(e) => { e.currentTarget.style.background='rgba(255, 77, 148, 0.25)'; e.currentTarget.style.boxShadow='0 0 20px rgba(255, 77, 148, 0.4)'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.background='rgba(255, 77, 148, 0.15)'; e.currentTarget.style.boxShadow='none'; }}
+                                  >
+                                    <LogOut size={20} />
+                                    SYSTEM LOGOUT
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => setRenderedActiveModal('auth')}
+                                    style={{
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                      width: '100%', padding: '18px', background: 'linear-gradient(90deg, #00d2ff, #43f5ff)', border: 'none',
+                                      borderRadius: '12px', color: '#0a1329', fontSize: '0.95rem', fontWeight: 900, cursor: 'pointer', outline: 'none', transition: 'all 0.2s', boxShadow: '0 0 20px rgba(67,245,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px'
+                                    }}
+                                  >
+                                    <User size={20} />
+                                    INITIALIZE LOGIN SEQUENCE
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                      </div>

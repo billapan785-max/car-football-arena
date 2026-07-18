@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <img id="myImg" src="/lcd.gif" style="display:none;" />
+  <canvas id="myCanvas" width="400" height="200"></canvas>
+  <script>
+    const img = document.getElementById('myImg');
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    function update() {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(update);
+    }
+    img.onload = () => update();
+  </script>
+</body>
+</html>
