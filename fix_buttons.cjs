@@ -1,0 +1,24 @@
+const fs = require('fs');
+let app = fs.readFileSync('src/App.tsx', 'utf8');
+
+app = app.replace(
+  "<button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>",
+  "<button onClick={() => setRenderedActiveModal('terms')} style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>"
+);
+
+app = app.replace(
+  "<button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>\n                                  🛡️ Privacy Policy",
+  "<button onClick={() => setRenderedActiveModal('privacy')} style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>\n                                  🛡️ Privacy Policy"
+);
+
+app = app.replace(
+  "<button style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>\n                                  🔐 Game Permissions",
+  "<button onClick={() => setRenderedActiveModal('permissions')} style={{ padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(67,245,255,0.15)', borderRadius: '12px', color: '#c4d1eb', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(67,245,255,0.1)'; e.currentTarget.style.color='#ffffff'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(0,0,0,0.3)'; e.currentTarget.style.color='#c4d1eb'; }}>\n                                  🔐 Game Permissions"
+);
+
+app = app.replace(
+  "<button style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#ef4444', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.2)'; e.currentTarget.style.boxShadow='0 0 10px rgba(239, 68, 68, 0.3)'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.1)'; e.currentTarget.style.boxShadow='none'; }}>\n                                  ⚠️ Delete Account",
+  "<button onClick={() => setRenderedActiveModal('delete_account')} style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#ef4444', fontSize: '0.85rem', fontWeight: 800, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', outline: 'none' }} onMouseOver={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.2)'; e.currentTarget.style.boxShadow='0 0 10px rgba(239, 68, 68, 0.3)'; }} onMouseOut={(e) => { e.currentTarget.style.background='rgba(239, 68, 68, 0.1)'; e.currentTarget.style.boxShadow='none'; }}>\n                                  ⚠️ Delete Account"
+);
+
+fs.writeFileSync('src/App.tsx', app, 'utf8');
