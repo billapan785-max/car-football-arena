@@ -4,6 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import {defineConfig} from 'vite';
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 export default defineConfig(() => {
   // Auto-copy football.glb to public if user uploaded it to the root folder
   try {
@@ -18,7 +20,7 @@ export default defineConfig(() => {
   }
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), cloudflare()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
